@@ -32,14 +32,11 @@ func Worker(in <-chan int64, out chan<- int64) {
 	// 2. Функция Worker
 	defer close(out)
 
-	for {
-		for v := range in {
-			out <- v
-			time.Sleep(1 * time.Millisecond)
-		}
-		
+	for v := range in {
+		out <- v
+		time.Sleep(1 * time.Millisecond)
 	}
-
+		
 }
 
 func main() {
@@ -65,7 +62,7 @@ func main() {
 	const NumOut = 5 // количество обрабатывающих горутин и каналов
 	// outs — слайс каналов, куда будут записываться числа из chIn
 	outs := make([]chan int64, NumOut)
-	for i := 0; i < NumOut; i++ {
+	for i := range outs {
 		// создаём каналы и для каждого из них вызываем горутину Worker
 		outs[i] = make(chan int64)
 		go Worker(chIn, outs[i])
@@ -81,20 +78,18 @@ func main() {
 	// 4. Собираем числа из каналов outs
 	for i := 0; i < NumOut; i++ {
 		wg.Add(1)
+
 		go func(in <-chan int64, i int) {
 			defer wg.Done()
 
-			v, ok := <- in
-			if !ok {
-				return
+			
+			for u := range in {
+				chOut <- u
+				amounts[i]++
 			}
-			amounts[i]++
-			chOut <- v
-
 		}(outs[i], i)
 	}
-
-
+	
 	go func() {
 		// ждём завершения работы всех горутин для outs
 		wg.Wait()
