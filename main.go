@@ -36,7 +36,6 @@ func Worker(in <-chan int64, out chan<- int64) {
 		out <- v
 		time.Sleep(1 * time.Millisecond)
 	}
-		
 }
 
 func main() {
@@ -82,14 +81,13 @@ func main() {
 		go func(in <-chan int64, i int) {
 			defer wg.Done()
 
-			
 			for u := range in {
 				chOut <- u
 				amounts[i]++
 			}
 		}(outs[i], i)
 	}
-	
+
 	go func() {
 		// ждём завершения работы всех горутин для outs
 		wg.Wait()
